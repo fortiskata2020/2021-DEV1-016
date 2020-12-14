@@ -54,7 +54,7 @@ public class BoardTest {
                 try {
                     board.setSymbol(Symbol.X, rowIndex, columnIndex);
                 } catch (Throwable throwable) {
-                    fail("All indexes are within the gridsize and adding a field should not fail.");
+                    fail("All indexes are within the grid size and adding a field should not fail.");
                 }
             }
         }
@@ -134,6 +134,4 @@ public class BoardTest {
         }
         assertTrue(board.isDraw());
     }
-
-
 }

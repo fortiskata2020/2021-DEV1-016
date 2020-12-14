@@ -1,5 +1,6 @@
 package com.tictactoe.tictactoe;
 
+import com.tictactoe.tictactoe.exceptions.NonExistingField;
 import com.tictactoe.tictactoe.exceptions.OccupiedFieldException;
 import com.tictactoe.tictactoe.exceptions.OngoingGameException;
 import com.tictactoe.tictactoe.model.GameState;
@@ -37,12 +38,22 @@ public class GameRunnerTest {
     }
 
     @Test
-    public void checkNoAlternatingSymbolAfterFalseField() {
+    public void checkNoAlternatingSymbolAfterOccupiedField() {
         assertDoesNotThrow(() -> gameRunner.parseCommand("new game"));
         assertDoesNotThrow(() -> gameRunner.parseCommand("1 1"));
         assertTrue(gameRunner.getCurrentSymbol() == Symbol.O);
         // O tries to play in the same field which fails
         assertThrows(OccupiedFieldException.class,() -> gameRunner.parseCommand("1 1"));
+        assertTrue(gameRunner.getCurrentSymbol() == Symbol.O);
+    }
+
+    @Test
+    public void checkNoAlternatingSymbolAfterUnreachableField() {
+        assertDoesNotThrow(() -> gameRunner.parseCommand("new game"));
+        assertDoesNotThrow(() -> gameRunner.parseCommand("1 1"));
+        assertTrue(gameRunner.getCurrentSymbol() == Symbol.O);
+        // O tries to play in the same field which fails
+        assertThrows(NonExistingField.class,() -> gameRunner.parseCommand("5 5"));
         assertTrue(gameRunner.getCurrentSymbol() == Symbol.O);
     }
 
@@ -109,6 +120,26 @@ public class GameRunnerTest {
         assertTrue(gameRunner.getState() == GameState.PLAYING);
         assertDoesNotThrow(() -> gameRunner.parseCommand("3 1")); //X
         assertTrue(gameRunner.getState() == GameState.WIN_X);
+    }
+
+    @Test
+    public void testDetectDraw() {
+        assertDoesNotThrow(() -> gameRunner.parseCommand("new game"));
+        assertDoesNotThrow(() -> gameRunner.parseCommand("1 1")); //X
+        assertDoesNotThrow(() -> gameRunner.parseCommand("1 2")); //O
+        assertDoesNotThrow(() -> gameRunner.parseCommand("1 3")); //X
+        assertTrue(gameRunner.getState() == GameState.PLAYING);
+
+        assertDoesNotThrow(() -> gameRunner.parseCommand("2 2")); //O
+        assertDoesNotThrow(() -> gameRunner.parseCommand("3 2")); //X
+        assertDoesNotThrow(() -> gameRunner.parseCommand("2 1")); //O
+        assertTrue(gameRunner.getState() == GameState.PLAYING);
+
+        assertDoesNotThrow(() -> gameRunner.parseCommand("2 3")); //X
+        assertDoesNotThrow(() -> gameRunner.parseCommand("3 3")); //O
+        assertDoesNotThrow(() -> gameRunner.parseCommand("3 1")); //X
+
+        assertTrue(gameRunner.getState() == GameState.DRAW);
     }
 
 }
